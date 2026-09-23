@@ -1,0 +1,11 @@
+# bro_002 — GRAPEX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_bro_002.yaml; this file only drives the CSI export.
+site: bro_002
+raw_data: ~/Library/CloudStorage/Box-Box/Crop_Sensing_Projects/GRAPEX/ground/BRO/MCM/BRO_002/RAW
+output: ~/Library/CloudStorage/Box-Box/ec_pipeline/output/bro_002/csi
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true

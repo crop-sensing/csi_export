@@ -1,0 +1,55 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# csi_export site config — copy to configs/<site>.yaml and edit.
+#
+#   csi-export --config configs/<site>.yaml            # write the annual CSVs
+#   csi-export --config configs/<site>.yaml --dry-run  # read + map + report only
+#
+# Relative paths resolve against THIS FILE's directory, not the shell's cwd,
+# so a config kept next to the data works on any machine.  ~ is expanded.
+# --raw and --output on the command line override the two paths below.
+#
+# The full ec_pipeline site config (site: {name: …}, paths: {raw_data: …,
+# output: …}, csi_export: {…}) is accepted as-is, so one file can serve both.
+# ─────────────────────────────────────────────────────────────────────────────
+site: bro_002                       # used as the output file prefix
+
+# The RAW tree holding the card folders (…/RAW/<year>/<SITE>_<date>_FLX/*.dat).
+# Any layout works — files are found recursively by name (Flux_CS*Format*,
+# Flux_CS_N, Flux_Notes*), TOB3 binary or TOA5 ASCII.
+raw_data: /Volumes/data/GRAPEX/ground/BRO/MCM/BRO_002/RAW
+
+# Where <site>_csi_<YYYY>.csv, <site>_csi_variables.csv and
+# <site>_csi_unmapped.csv are written.
+output: ./exports/bro_002
+
+csi_export:
+  sources: [cs, notes]        # tables to read.  The AmeriFlux export table is
+                              # deliberately NOT a source: it is a subset of
+                              # Flux_CS with gaps between card pulls.
+  extra_dirs: []              # more roots to search — e.g. a CONVERTED/<yr>/
+                              # CSI_TURB TOA5 folder, or pre-CR6 years that
+                              # only exist as converted .dat files
+
+  # Site-specific renames, RAW NAME → canonical name, applied BEFORE the
+  # shared aliases in the package's schema.yaml.  Use for a column that this
+  # particular program named differently from every other one; the shared
+  # aliases already cover the generic program-generation drift
+  # (SoilWater_i → SWC_i_1_1, batt_volt → V_batt, TA_2_1_1 → TA_1_1_2, …)
+  # and the CR3000-era names (Hc → H, LE_wpl → LE, wnd_spd → WS, …).
+  rename: {}
+  #  e.g.  rename: { T_hmp_2m_Avg: TA_1_1_3, RH_hmp_2m_Avg: RH_1_1_3 }
+
+  # Unit fixes: canonical name → multiplier.
+  scale: {}
+  #  e.g.  scale: { RH_1_1_1: 100 }     # RH logged as a fraction
+
+  # Canonical or raw names to leave out of the export.
+  drop: []
+
+  keep_unmapped: true         # pass columns nothing matched through under their
+                              # raw name (they are also listed in _csi_unmapped.csv)
+  derive_netrad: true         # fill NETRAD from SW_IN−SW_OUT+LW_IN−LW_OUT where the
+                              # program logged only the four components; rows so
+                              # filled are marked "4-stream" in NETRAD_src
+  min_rows_per_year: 48       # a calendar year with fewer rows is a corrupt-slot
+                              # timestamp artefact, not a year — dropped

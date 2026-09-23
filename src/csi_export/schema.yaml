@@ -1,0 +1,987 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# csi_schema.yaml — canonical 30-min datalogger schema for export_csi_annual.py
+#
+# The canonical vocabulary is the newest EasyFlux-DL (CR6, *_EZFlux_2024_v1 /
+# BLS_v5 / BRO_002_flux_v2) table naming, which is AmeriFlux-style
+# (H, LE, FC_mass, NETRAD, SW_IN, TA_1_1_1, SWC_1_1_1, …).  Older programs are
+# mapped INTO it through `aliases`.  Sources of the aliases:
+#   * 2026-09-23 header survey of every Flux_CS*/Flux_Notes TOB3 file across
+#     all sites (251 site-year headers, 14 CS + 9 Notes variants):
+#       2021-2024 EasyFlux  →  2024+ EZFlux   e.g. SoilWater_i → SWC_i_1_1,
+#       hydra{i}_temp → TS_CS65X_1_1_i, batt_volt → V_batt, amb_e → e_amb,
+#       TA_2_1_1 → TA_1_1_2 (cell-derived pair), TA_3_1_1 → TA_1_1_3 (probe),
+#       T_nr / T_nr_Avg → T_nr_in, LW_IN_meas → R_LW_in_meas,
+#       poor_energy_closure_flg → poor_enrg_clsur; Notes: UTC_offset →
+#       UTC_OFFSET, amb_rho_a → rho_a_amb.
+#   * CR3000-era names (RIP_760 pre-2021, rip760_pre2021_reader.FLUX_RENAME):
+#       Hc → H, LE_wpl → LE, Fc_wpl → FC_mass, wnd_spd → WS, T_hmp_Avg → TA_1_1_1,
+#       Incoming_SW_Avg → SW_IN, Incoming_LW_TC_Avg → LW_IN (the *_TC_ ones are
+#       the absolute longwave; Incoming_LW_Avg is the RAW THERMOPILE → R_LW_in_meas).
+#   * Barrelli TOA5/Excel names (convert_barrelli_to_ameriflux.py):
+#       SHF{i}_Avg → G_plate_i_1_1, TC{i}_{d}cm_Avg → TS{i}_{d}cm, H{i}_SM → SWC_i_1_1.
+#
+# Per-site overrides go in the site config under `csi_export.rename` (applied
+# BEFORE these aliases) and `csi_export.scale` (unit fixes, e.g. RH as a
+# fraction → ×100).  Anything not covered here or there is passed through
+# under its raw name and listed in <prefix>_csi_unmapped.csv so it can be
+# added.
+#
+# `table` says where the variable normally lives (cs = Flux_CSFormat,
+# notes = Flux_Notes, both).  When the same name occurs in both tables the CS
+# value wins and the Notes copy is dropped (they are identical logger values).
+# ─────────────────────────────────────────────────────────────────────────────
+timestamp:
+  name: timestamp
+  convention: "period START, tz-naive, logger clock (PST at every GRAPEX/TREX tower so far)"
+  note: "TOB3 slot times are period END; the reader subtracts one interval."
+
+variables:
+  # ── Flux_CSFormat (30-min fluxes, met, radiation, soil) ─────────────────
+  V_batt:
+    units: "V"
+    table: both
+    description: "Logger battery voltage"
+    aliases: [batt_volt]
+  FC_mass:
+    units: "mg m-2 s-1"
+    table: cs
+    description: "CO2 flux, mass basis"
+    aliases: [Fc_wpl]
+  FC_QC:
+    units: "Grade"
+    table: cs
+  FC_samples:
+    units: "samples"
+    table: cs
+  LE:
+    units: "W m-2"
+    table: cs
+    description: "Latent heat flux (WPL-corrected)"
+    aliases: [LE_wpl]
+  LE_QC:
+    units: "Grade"
+    table: cs
+  LE_samples:
+    units: "samples"
+    table: cs
+  H:
+    units: "W m-2"
+    table: cs
+    description: "Sensible heat flux (EasyFlux, after corrections)"
+    aliases: [Hc]
+  H_QC:
+    units: "grade"
+    table: cs
+  H_samples:
+    units: "samples"
+    table: cs
+  NETRAD:
+    units: "W m-2"
+    table: cs
+    description: "Net radiation (4-stream or NR-Lite)"
+    aliases: [Rn_total_Avg]
+  G:
+    units: ""
+    table: cs
+    description: "Ground heat flux at the surface (plate + storage, site mean)"
+  G_1_1_1:
+    units: "W m-2"
+    table: cs
+  G_2_1_1:
+    units: "W m-2"
+    table: cs
+  G_3_1_1:
+    units: "W m-2"
+    table: cs
+  G_4_1_1:
+    units: "W m-2"
+    table: cs
+  G_5_1_1:
+    units: "W m-2"
+    table: cs
+  SG_1_1_1:
+    units: "W m-2"
+    table: cs
+  SG_2_1_1:
+    units: "W m-2"
+    table: cs
+  SG_3_1_1:
+    units: "W m-2"
+    table: cs
+  SG_4_1_1:
+    units: "W m-2"
+    table: cs
+  SG_5_1_1:
+    units: "W m-2"
+    table: cs
+  G_plate_1_1_1:
+    units: "W m-2"
+    table: cs
+    aliases: [SHF1_Avg]
+  G_plate_2_1_1:
+    units: "W m-2"
+    table: cs
+    aliases: [SHF2_Avg]
+  G_plate_3_1_1:
+    units: "W m-2"
+    table: cs
+    aliases: [SHF3_Avg]
+  G_plate_4_1_1:
+    units: "W m-2"
+    table: cs
+    aliases: [SHF4_Avg]
+  G_plate_5_1_1:
+    units: "W m-2"
+    table: cs
+    aliases: [SHF5_Avg]
+  energy_closure:
+    units: "fraction"
+    table: cs
+  poor_enrg_clsur:
+    units: ""
+    table: cs
+    description: "EasyFlux poor-energy-closure flag"
+    aliases: [poor_energy_closure_flg]
+  Bowen_ratio:
+    units: "fraction"
+    table: cs
+  TAU:
+    units: "kg m-1 s-2"
+    table: cs
+    aliases: [tau]
+  TAU_QC:
+    units: "grade"
+    table: cs
+  USTAR:
+    units: "m s-1"
+    table: cs
+    aliases: [u_star]
+  TSTAR:
+    units: "deg C"
+    table: cs
+  TKE:
+    units: "m2 s-2"
+    table: cs
+  TA_1_1_1:
+    units: "deg C"
+    table: cs
+    description: "Air temperature, ambient (sonic + IRGA derived)"
+    aliases: [T_hmp_Avg]
+  RH_1_1_1:
+    units: "%"
+    table: cs
+    description: "Relative humidity, ambient"
+    aliases: [RH_hmp_Avg]
+  T_DP_1_1_1:
+    units: "deg C"
+    table: cs
+  e_amb:
+    units: "kPa"
+    table: cs
+    description: "Ambient vapour pressure (sonic T + IRGA H2O)"
+    aliases: [amb_e, e_hmp_Avg]
+  e_sat_amb:
+    units: "kPa"
+    table: cs
+    description: "Ambient saturation vapour pressure"
+    aliases: [amb_e_sat, e_sat_hmp_Avg]
+  TA_1_1_2:
+    units: "deg C"
+    table: cs
+    description: "Air temperature, IRGASON cell-derived pair"
+    aliases: [TA_2_1_1]
+  RH_1_1_2:
+    units: "%"
+    table: cs
+    description: "Relative humidity, cell-derived pair"
+    aliases: [RH_2_1_1]
+  T_DP_1_1_2:
+    units: "deg C"
+    table: cs
+    aliases: [T_DP_2_1_1]
+  e:
+    units: "kPa"
+    table: cs
+  e_sat:
+    units: "kPa"
+    table: cs
+  TA_1_1_3:
+    units: "deg C"
+    table: cs
+    description: "Air temperature, independent T/RH probe"
+    aliases: [TA_3_1_1, Temp_Asp_Avg]
+  RH_1_1_3:
+    units: "%"
+    table: cs
+    description: "Relative humidity, T/RH probe"
+    aliases: [RH_3_1_1, Rh_Asp_Avg]
+  T_DP_1_1_3:
+    units: "deg C"
+    table: cs
+    aliases: [T_DP_3_1_1]
+  e_probe:
+    units: "kPa"
+    table: cs
+  e_sat_probe:
+    units: "kPa"
+    table: cs
+  H2O_density_probe:
+    units: "g/m^3"
+    table: cs
+    aliases: [H2O_probe]
+  PA:
+    units: "kPa"
+    table: cs
+    aliases: [amb_press_mean]
+  VPD:
+    units: "hPa"
+    table: cs
+  Ux:
+    units: "m s-1"
+    table: cs
+  Ux_SIGMA:
+    units: "m s-1"
+    table: cs
+  Uy:
+    units: "m s-1"
+    table: cs
+  Uy_SIGMA:
+    units: "m s-1"
+    table: cs
+  Uz:
+    units: "m s-1"
+    table: cs
+  Uz_SIGMA:
+    units: "m s-1"
+    table: cs
+  T_SONIC:
+    units: "deg C"
+    table: cs
+    aliases: [Ts_Avg]
+  T_SONIC_SIGMA:
+    units: "deg C"
+    table: cs
+  sonic_azimuth:
+    units: "Decimal degrees"
+    table: cs
+  WS:
+    units: "m s-1"
+    table: cs
+    aliases: [wnd_spd]
+  WS_RSLT:
+    units: "m s-1"
+    table: cs
+    aliases: [rslt_wnd_spd]
+  WD_SONIC:
+    units: "decimal degrees"
+    table: cs
+    aliases: [wnd_dir_sonic]
+  WD_SIGMA:
+    units: "decimal degrees"
+    table: cs
+    aliases: [std_wnd_dir]
+  WD:
+    units: "decimal degrees"
+    table: cs
+    aliases: [wnd_dir_compass]
+  WS_MAX:
+    units: "m s-1"
+    table: cs
+  CO2_density:
+    units: "mg m-3"
+    table: cs
+    aliases: [CO2_mean]
+  CO2_density_SIGMA:
+    units: "mg m-3"
+    table: cs
+  H2O_density:
+    units: "g m-3"
+    table: cs
+    aliases: [H2O_mean]
+  H2O_density_SIGMA:
+    units: "g m-3"
+    table: cs
+  CO2_sig_strgth_Min:
+    units: "fraction"
+    table: cs
+  H2O_sig_strgth_Min:
+    units: "fraction"
+    table: cs
+  P:
+    units: "mm"
+    table: cs
+    description: "Precipitation total"
+    aliases: [P_Tot, Rain_mm_Tot]
+  ALB:
+    units: "%"
+    table: cs
+  SW_IN:
+    units: "W m-2"
+    table: cs
+    aliases: [Incoming_SW_Avg]
+  SW_OUT:
+    units: "W m-2"
+    table: cs
+    aliases: [Outgoing_SW_Avg]
+  LW_IN:
+    units: "W m-2"
+    table: cs
+    aliases: [Incoming_LW_TC_Avg]
+  LW_OUT:
+    units: "W m-2"
+    table: cs
+    aliases: [Terrest_LW_TC_Avg]
+  T_nr_in:
+    units: "Klvin"
+    table: cs
+    description: "Net-radiometer body temperature (upward sensor)"
+    aliases: [T_nr, T_nr_Avg]
+  T_nr_out:
+    units: "Klvin"
+    table: cs
+    description: "Net-radiometer body temperature (downward sensor)"
+  sun_azimuth:
+    units: "decimal degrees"
+    table: cs
+  sun_elevation:
+    units: "decimal degrees"
+    table: cs
+  hour_angle:
+    units: "decimal degrees"
+    table: cs
+  sun_declination:
+    units: "decimal degrees"
+    table: cs
+  air_mass_coeff:
+    units: "adimensional"
+    table: cs
+  daytime:
+    units: "fraction"
+    table: cs
+  T_CANOPY:
+    units: "deg C"
+    table: cs
+    description: "IRT canopy temperature (SI-111)"
+  T_SI111_body:
+    units: "deg C"
+    table: cs
+    description: "IRT body temperature"
+  TS1_2cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC1_2cm_Avg]
+  TS1_6cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC1_6cm_Avg]
+  TS2_2cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC2_2cm_Avg]
+  TS2_6cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC2_6cm_Avg]
+  TS3_2cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC3_2cm_Avg]
+  TS3_6cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC3_6cm_Avg]
+  TS4_2cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC4_2cm_Avg]
+  TS4_6cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC4_6cm_Avg]
+  TS5_2cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC5_2cm_Avg]
+  TS5_6cm:
+    units: "deg C"
+    table: cs
+    aliases: [TC5_6cm_Avg]
+  SWC_1_1_1:
+    units: "%"
+    table: cs
+    aliases: [SoilWater_1, H1_SM]
+  SWC_2_1_1:
+    units: "%"
+    table: cs
+    aliases: [SoilWater_2, H2_SM]
+  SWC_3_1_1:
+    units: "%"
+    table: cs
+    aliases: [SoilWater_3, H3_SM]
+  SWC_4_1_1:
+    units: "%"
+    table: cs
+    aliases: [SoilWater_4, H4_SM]
+  SWC_5_1_1:
+    units: "%"
+    table: cs
+    aliases: [SoilWater_5, H5_SM]
+  TS_CS65X_1_1_1:
+    units: "deg C"
+    table: cs
+    aliases: [hydra1_temp, H1_TempC]
+  TS_CS65X_1_1_2:
+    units: "deg C"
+    table: cs
+    aliases: [hydra2_temp, H2_TempC]
+  TS_CS65X_1_1_3:
+    units: "deg C"
+    table: cs
+    aliases: [hydra3_temp, H3_TempC]
+  TS_CS65X_1_1_4:
+    units: "deg C"
+    table: cs
+    aliases: [hydra4_temp, H4_TempC]
+  TS_CS65X_1_1_5:
+    units: "deg C"
+    table: cs
+    aliases: [hydra5_temp, H5_TempC]
+  cs65x_ec_1_1_1:
+    units: "dS m-1"
+    table: cs
+  cs65x_ec_1_1_2:
+    units: "dS m-1"
+    table: cs
+  cs65x_ec_1_1_3:
+    units: "dS m-1"
+    table: cs
+  cs65x_ec_1_1_4:
+    units: "dS m-1"
+    table: cs
+  cs65x_ec_1_1_5:
+    units: "dS m-1"
+    table: cs
+  FETCH_MAX:
+    units: "m"
+    table: cs
+  FETCH_90:
+    units: "m"
+    table: cs
+  FETCH_55:
+    units: "m"
+    table: cs
+  FETCH_40:
+    units: "m"
+    table: cs
+  UPWND_DIST_INTRST:
+    units: "m"
+    table: cs
+  FP_DIST_INTRST:
+    units: "%"
+    table: cs
+  FP_EQUATION:
+    units: "authors"
+    table: cs
+
+  # ── Flux_Notes (rotation, stability, spectral factors, diagnostics, geometry)
+  UxUy_Cov:
+    units: "m2 s-2"
+    table: notes
+  UxUz_Cov:
+    units: "m2 s-2"
+    table: notes
+  UyUz_Cov:
+    units: "m2 s-2"
+    table: notes
+  TsUx_Cov:
+    units: "deg C m s-1"
+    table: notes
+  TsUy_Cov:
+    units: "deg C m s-1"
+    table: notes
+  TsUz_Cov:
+    units: "deg C m s-1"
+    table: notes
+  USTAR_R:
+    units: "m s-1"
+    table: notes
+  U:
+    units: "m s-1"
+    table: notes
+  U_SIGMA:
+    units: "m s-1"
+    table: notes
+  V:
+    units: "m s-1"
+    table: notes
+  V_SIGMA:
+    units: "m s-1"
+    table: notes
+  W:
+    units: "m s-1"
+    table: notes
+  W_SIGMA:
+    units: "m s-1"
+    table: notes
+  UV_Cov:
+    units: "m2 s-2"
+    table: notes
+  UW_Cov:
+    units: "m2 s-2"
+    table: notes
+  VW_Cov:
+    units: "m2 s-2"
+    table: notes
+  UT_SONIC_Cov:
+    units: "deg C m s-1"
+    table: notes
+  VT_SONIC_Cov:
+    units: "deg C m s-1"
+    table: notes
+  WT_SONIC_Cov:
+    units: "deg C m s-1"
+    table: notes
+  UW_Cov_fc:
+    units: "m2 s-2"
+    table: notes
+  VW_Cov_fc:
+    units: "m2 s-2"
+    table: notes
+  WT_SONIC_Cov_fc:
+    units: "deg C m s-1"
+    table: notes
+  WT_SONIC_Cov_fc_SND:
+    units: "deg C m s-1"
+    table: notes
+  sonic_samples:
+    units: "samples"
+    table: notes
+  diag_sonic_aggregate:
+    units: "adimensional"
+    table: notes
+  no_sonic_head_Tot:
+    units: "samples"
+    table: notes
+  no_new_sonic_data_Tot:
+    units: "samples"
+    table: notes
+  sonic_amp_l_f_Tot:
+    units: "samples"
+    table: notes
+  sonic_amp_h_f_Tot:
+    units: "samples"
+    table: notes
+  sonic_sig_lck_f_Tot:
+    units: "samples"
+    table: notes
+  sonic_del_T_f_Tot:
+    units: "samples"
+    table: notes
+  sonic_aq_sig_f_Tot:
+    units: "samples"
+    table: notes
+  sonic_cal_err_f_Tot:
+    units: "samples"
+    table: notes
+  UxCO2_Cov:
+    units: "mg m-2 s-1"
+    table: notes
+  UyCO2_Cov:
+    units: "mg m-2 s-1"
+    table: notes
+  UzCO2_Cov:
+    units: "mg m-2 s-1"
+    table: notes
+  UxH2O_Cov:
+    units: "g m-2 s-1"
+    table: notes
+  UyH2O_Cov:
+    units: "g m-2 s-1"
+    table: notes
+  UzH2O_Cov:
+    units: "g m-2 s-1"
+    table: notes
+  UCO2_Cov:
+    units: "mg m-2 s-1"
+    table: notes
+  VCO2_Cov:
+    units: "mg m-2 s-1"
+    table: notes
+  WCO2_Cov:
+    units: "mg m-2 s-1"
+    table: notes
+  UH2O_Cov:
+    units: "g m-2 s-1"
+    table: notes
+  VH2O_Cov:
+    units: "g m-2 s-1"
+    table: notes
+  WH2O_Cov:
+    units: "g m-2 s-1"
+    table: notes
+  WCO2_Cov_fc:
+    units: "mg m-2 s-1"
+    table: notes
+  WH2O_Cov_fc:
+    units: "g m-2 s-1"
+    table: notes
+  CO2_E_WPL_fc:
+    units: "mg m-2 s-1"
+    table: notes
+  CO2_T_WPL_fc:
+    units: "mg m-2 s-1"
+    table: notes
+  H2O_E_WPL_fc:
+    units: "g m-2 s-1"
+    table: notes
+  H2O_T_WPL_fc:
+    units: "g m-2 s-1"
+    table: notes
+  CO2_samples:
+    units: "samples"
+    table: notes
+  H2O_samples:
+    units: "samples"
+    table: notes
+  diag_irga_aggregate:
+    units: "adimensional"
+    table: notes
+  no_irga_head_Tot:
+    units: "samples"
+    table: notes
+  no_new_irga_data_Tot:
+    units: "samples"
+    table: notes
+  irga_bad_data_f_Tot:
+    units: "samples"
+    table: notes
+  irga_gen_fault_f_Tot:
+    units: "samples"
+    table: notes
+  irga_startup_f_Tot:
+    units: "samples"
+    table: notes
+  irga_motor_spd_f_Tot:
+    units: "samples"
+    table: notes
+  irga_tec_tmpr_f_Tot:
+    units: "samples"
+    table: notes
+  irga_src_pwr_f_Tot:
+    units: "samples"
+    table: notes
+  irga_src_tmpr_f_Tot:
+    units: "samples"
+    table: notes
+  irga_src_curr_f_Tot:
+    units: "samples"
+    table: notes
+  irga_off_f_Tot:
+    units: "samples"
+    table: notes
+  irga_sync_f_Tot:
+    units: "samples"
+    table: notes
+  irga_amb_tmpr_f_Tot:
+    units: "samples"
+    table: notes
+  irga_amb_press_f_Tot:
+    units: "samples"
+    table: notes
+  irga_CO2_I_f_Tot:
+    units: "samples"
+    table: notes
+  irga_CO2_Io_f_Tot:
+    units: "samples"
+    table: notes
+  irga_H2O_I_f_Tot:
+    units: "samples"
+    table: notes
+  irga_H2O_Io_f_Tot:
+    units: "samples"
+    table: notes
+  irga_CO2_Io_var_f_Tot:
+    units: "samples"
+    table: notes
+  irga_H2O_Io_var_f_Tot:
+    units: "samples"
+    table: notes
+  irga_CO2_sig_strgth_f_Tot:
+    units: "samples"
+    table: notes
+  irga_H2O_sig_strgth_f_Tot:
+    units: "samples"
+    table: notes
+  irga_cal_err_f_Tot:
+    units: "samples"
+    table: notes
+  irga_htr_ctrl_off_f_Tot:
+    units: "samples"
+    table: notes
+  alpha:
+    units: "Decimal degrees"
+    table: notes
+  beta:
+    units: "Decimal degrees"
+    table: notes
+  gamma:
+    units: "Decimal degrees"
+    table: notes
+  height_measurement:
+    units: "m"
+    table: notes
+  height_canopy:
+    units: "m"
+    table: notes
+  surface_type_text:
+    units: ""
+    table: notes
+  displacement_user:
+    units: "m"
+    table: notes
+  d:
+    units: "m"
+    table: notes
+  roughness_user:
+    units: "m"
+    table: notes
+  z0:
+    units: "m"
+    table: notes
+  z:
+    units: "m"
+    table: notes
+  MO_LENGTH:
+    units: "m"
+    table: notes
+  ZL:
+    units: "adimensional"
+    table: notes
+  iteration_FreqFactor:
+    units: ""
+    table: notes
+  latitude:
+    units: "Decimal degrees"
+    table: notes
+    description: "Site latitude as entered in the logger (often WRONG — see site config)"
+  longitude:
+    units: "Decimal degrees"
+    table: notes
+    description: "Site longitude as entered in the logger (sign often dropped)"
+  altitude:
+    units: "m"
+    table: notes
+  UTC_OFFSET:
+    units: ""
+    table: notes
+    aliases: [UTC_offset]
+  separation_x_irga:
+    units: "m"
+    table: notes
+  separation_y_irga:
+    units: "m"
+    table: notes
+  separation_lat_dist_irga:
+    units: "m"
+    table: notes
+  separation_lag_dist_irga:
+    units: "m"
+    table: notes
+  separation_lag_scan_irga:
+    units: "scans"
+    table: notes
+  MAX_LAG:
+    units: ""
+    table: notes
+  lag_irga:
+    units: "scans"
+    table: notes
+  FreqFactor_UW_VW:
+    units: "adimensional"
+    table: notes
+  FreqFactor_WT_SONIC:
+    units: "adimensional"
+    table: notes
+  FreqFactor_WCO2_WH2O:
+    units: "adimensional"
+    table: notes
+  rho_d_amb:
+    units: "g m-3"
+    table: notes
+    aliases: [amb_rho_d]
+  rho_a_amb:
+    units: "kg m-3"
+    table: notes
+    aliases: [amb_rho_a]
+  rho_d:
+    units: "g m-3"
+    table: notes
+  rho_a:
+    units: "kg m-3"
+    table: notes
+  rho_d_probe:
+    units: "g/m^3"
+    table: notes
+  rho_a_probe:
+    units: "kg m-3"
+    table: notes
+  Cp:
+    units: "J kg-1 deg C-1"
+    table: notes
+  Lv:
+    units: "J g-1"
+    table: notes
+  T_panel:
+    units: "deg C"
+    table: notes
+  slowsequence_Tot:
+    units: "samples"
+    table: notes
+  sn500_heater_secs:
+    units: ""
+    table: notes
+  shfp_cal_1_1_1:
+    units: ""
+    table: notes
+  shfp_cal_1_1_2:
+    units: ""
+    table: notes
+  shfp_cal_1_1_3:
+    units: ""
+    table: notes
+  process_time:
+    units: "ms"
+    table: notes
+  process_time_Max:
+    units: "ms"
+    table: notes
+  buff_depth_Max:
+    units: "scans"
+    table: notes
+
+  # ── Present at some sites only (fine-wire TC, IRT-era programs, BLS 3-position soil, TS100 fan)
+  Duty_cycle_TS100_Fan_Avg:
+    units: "%"
+    table: cs
+  ET:
+    units: "mm"
+    table: cs
+    description: "Evapotranspiration"
+  FW:
+    units: "deg C"
+    table: cs
+  FW_SIGMA:
+    units: "deg C"
+    table: cs
+  FW_diameter:
+    units: "m"
+    table: notes
+  FW_samples:
+    units: "samples"
+    table: notes
+  FreqFactor_WFW:
+    units: ""
+    table: notes
+  Freq_tach_TS100_Avg:
+    units: "Hz"
+    table: cs
+  G_1_1_2:
+    units: "W m-2"
+    table: cs
+  G_1_1_3:
+    units: "W m-2"
+    table: cs
+  G_plate_1_1_2:
+    units: "W m-2"
+    table: cs
+  G_plate_1_1_3:
+    units: "W m-2"
+    table: cs
+  H_FW:
+    units: "W m-2"
+    table: notes
+  H_FW_samples:
+    units: "samples"
+    table: cs
+  R_LW_in_meas:
+    units: ""
+    table: cs
+    description: "Raw pyrgeometer thermopile signal, incoming (NOT absolute LW)"
+    aliases: [LW_IN_meas, Incoming_LW_Avg]
+  R_LW_out_meas:
+    units: ""
+    table: cs
+    description: "Raw pyrgeometer thermopile signal, outgoing (NOT absolute LW)"
+    aliases: [LW_OUT_meas, Terrestrial_LW_Avg]
+  SG:
+    units: "W m-2"
+    table: cs
+  SG_1_1_2:
+    units: "W m-2"
+    table: cs
+  SG_1_1_3:
+    units: "W m-2"
+    table: cs
+  SWC_1_1_2:
+    units: "%"
+    table: cs
+  SWC_1_1_3:
+    units: "%"
+    table: cs
+  Site:
+    units: ""
+    table: cs
+  TS100_freq:
+    units: "Hz"
+    table: notes
+  TS_1_1_1:
+    units: "deg C"
+    table: cs
+  TS_1_1_2:
+    units: "deg C"
+    table: cs
+  TS_1_1_3:
+    units: "deg C"
+    table: cs
+  UFW_Cov:
+    units: "deg C m s-1"
+    table: cs
+  UxFW_Cov:
+    units: "deg C m s-1"
+    table: cs
+  UyFW_Cov:
+    units: "deg C m s-1"
+    table: cs
+  UzFW_Cov:
+    units: "deg C m s-1"
+    table: cs
+  VFW_Cov:
+    units: "deg C m s-1"
+    table: cs
+  WFW_Cov:
+    units: "deg C m s-1"
+    table: cs
+  WFW_Cov_fc:
+    units: "deg C m s-1"
+    table: cs
+  lag_FW:
+    units: "scans"
+    table: notes
+  separation_lag_dist_FW:
+    units: "m"
+    table: notes
+  separation_lag_scan_FW:
+    units: "scans"
+    table: notes
+  separation_lat_dist_FW:
+    units: "m"
+    table: notes
+  separation_x_FW:
+    units: "m"
+    table: notes
+  separation_y_FW:
+    units: "m"
+    table: notes
+  time_const_FW:
+    units: "s"
+    table: notes

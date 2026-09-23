@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csi_export"
+version = "0.1.0"
+description = "Homogenised one-CSV-per-year export of Campbell Scientific EasyFlux-DL 30-min tables (Flux_CSIFormat + Flux_Notes, TOB3 or TOA5) with config-driven variable renaming"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Nicolas Bambach", email = "nbambach@ucdavis.edu" }]
+keywords = ["eddy covariance", "campbell scientific", "TOB3", "EasyFlux", "datalogger", "AmeriFlux"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = ["numpy>=1.20", "pandas>=1.3", "pyyaml>=5.4"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+csi-export = "csi_export.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+csi_export = ["schema.yaml"]

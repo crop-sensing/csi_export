@@ -1,0 +1,9 @@
+__pycache__/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+exports/
+configs/*_local.yaml
+!configs/example_site.yaml
+.DS_Store
