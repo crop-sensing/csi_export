@@ -103,7 +103,8 @@ def _is_local(fp: str) -> bool:
     only consulted when --skip-online-only is given."""
     try:
         st = os.stat(fp)
-        return not (getattr(st, "st_flags", 0) & _SF_DATALESS) and st.st_blocks > 0
+        print(st)
+        return not (getattr(st, "st_flags", 0) & _SF_DATALESS) and st.st_size/512 > 0
     except OSError:
         return False
 
