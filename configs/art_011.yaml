@@ -1,0 +1,11 @@
+# art_011 — TREX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_art_011.yaml; this file only drives the CSI export.
+site: art_011
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/TREX/ground/ART/MCM/ART_011/RAW
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/TREX/ground/ART/MCM/ART_011/PROCESSED/HOURLY/UNCLEAN
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true

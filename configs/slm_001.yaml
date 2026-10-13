@@ -1,0 +1,11 @@
+# slm_001 — GRAPEX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_slm_001.yaml; this file only drives the CSI export.
+site: slm_001
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/SLM/MCM/SLM_001/RAW
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/SLM/MCM/SLM_001/PROCESSED/HOURLY/UNCLEAN
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true

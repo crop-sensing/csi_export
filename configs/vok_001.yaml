@@ -1,0 +1,11 @@
+# vok_001 — GRAPEX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_vok_001.yaml; this file only drives the CSI export.
+site: vok_001
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/VOK/MCM/VOK_001/RAW
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/VOK/MCM/VOK_001/PROCESSED/HOURLY/UNCLEAN
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true

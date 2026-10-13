@@ -103,7 +103,7 @@ def _is_local(fp: str) -> bool:
     only consulted when --skip-online-only is given."""
     try:
         st = os.stat(fp)
-        print(st)
+        #print(st)
         return not (getattr(st, "st_flags", 0) & _SF_DATALESS) and st.st_size/512 > 0
     except OSError:
         return False
@@ -450,18 +450,18 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     for y in years:
         m = merged.timestamp.dt.year == y
-        fp = out_dir / f"{prefix}_csi_{y}.csv"
+        fp = out_dir / f"{prefix.upper()}_CSI_Subdaily_{y}.csv"
         merged[m].to_csv(fp, index=False, float_format="%.6g",
                          date_format="%Y-%m-%d %H:%M:%S")
         print(f"  wrote {fp.name}  ({int(m.sum()):,} rows, {merged.shape[1]} cols)")
-    var_df.to_csv(out_dir / f"{prefix}_csi_variables.csv", index=False)
+    var_df.to_csv(out_dir / f"{prefix.upper()}_CSI_Variables.csv", index=False)
     if unmapped:
         pd.DataFrame({"raw_name": sorted(unmapped),
                       "table": [";".join(t for t, s in unmapped_all.items() if c in s)
                                 for c in sorted(unmapped)]}
-                     ).to_csv(out_dir / f"{prefix}_csi_unmapped.csv", index=False)
-    print(f"  wrote {prefix}_csi_variables.csv"
-          + (f", {prefix}_csi_unmapped.csv" if unmapped else ""))
+                     ).to_csv(out_dir / f"{prefix.upper()}_CSI_Unmapped.csv", index=False)
+    print(f"  wrote {prefix.upper()}_CSI_Variables.csv"
+          + (f", {prefix.upper()}_CSI_Unmapped.csv" if unmapped else ""))
 
 
 if __name__ == "__main__":

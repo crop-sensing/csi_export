@@ -1,0 +1,11 @@
+# wwf_001 — TREX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_wwf_001.yaml; this file only drives the CSI export.
+site: wwf_001
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/TREX/ground/WWF/MCM/WWF_001/RAW
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/TREX/ground/WWF/MCM/WWF_001/PROCESSED/HOURLY/UNCLEAN
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true

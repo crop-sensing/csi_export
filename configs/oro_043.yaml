@@ -1,0 +1,11 @@
+# oro_043 — TREX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_oro_043.yaml; this file only drives the CSI export.
+site: oro_043
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/TREX/ground/ORO/MCM/ORO_043/RAW
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/TREX/ground/ORO/MCM/ORO_043/PROCESSED/HOURLY/UNCLEAN
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true

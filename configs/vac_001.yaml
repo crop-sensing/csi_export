@@ -1,0 +1,11 @@
+# vac_001 — TREX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_vac_001.yaml; this file only drives the CSI export.
+site: vac_001
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/TREX/ground/VAC/MCM/VAC_001/RAW
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/TREX/ground/VAC/MCM/VAC_001/PROCESSED/HOURLY/UNCLEAN
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true

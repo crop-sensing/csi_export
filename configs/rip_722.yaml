@@ -1,0 +1,11 @@
+# rip_722 — GRAPEX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_rip_722.yaml; this file only drives the CSI export.
+site: rip_722
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/RIP/MCM/RIP_722/RAW
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/RIP/MCM/RIP_722/PROCESSED/HOURLY/UNCLEAN
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true

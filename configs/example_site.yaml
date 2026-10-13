@@ -16,11 +16,11 @@ site: bro_002                       # used as the output file prefix
 # The RAW tree holding the card folders (…/RAW/<year>/<SITE>_<date>_FLX/*.dat).
 # Any layout works — files are found recursively by name (Flux_CS*Format*,
 # Flux_CS_N, Flux_Notes*), TOB3 binary or TOA5 ASCII.
-raw_data: /Volumes/data/GRAPEX/ground/BRO/MCM/BRO_002/RAW
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/BRO/MCM/BRO_002/RAW
 
 # Where <site>_csi_<YYYY>.csv, <site>_csi_variables.csv and
 # <site>_csi_unmapped.csv are written.
-output: ./exports/bro_002
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/BRO/MCM/BRO_002/PROCESSED
 
 csi_export:
   sources: [cs, notes]        # tables to read.  The AmeriFlux export table is

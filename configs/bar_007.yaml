@@ -1,0 +1,11 @@
+# bar_007 — GRAPEX / MCM.  Coordinates and every logger trap are documented in
+# ec_pipeline/config_bar_007.yaml; this file only drives the CSI export.
+site: bar_007
+raw_data: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/BAR/MCM/BAR_007/RAW
+output: C:/Users/mina.swintek/Box/Crop_Sensing_Projects/GRAPEX/ground/BAR/MCM/BAR_007/PROCESSED/HOURLY/UNCLEAN
+csi_export:
+  sources: [cs, notes]
+  rename: {}
+  scale: {}
+  drop: []
+  derive_netrad: true
